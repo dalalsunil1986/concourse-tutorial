@@ -1,0 +1,19 @@
+---
+resources:
+- name: spring-petclinic
+  type: git
+  source:
+    uri: https://github.com/spring-projects/spring-petclinic.git
+- name: spring-petclinic-concourse
+  type: git
+  source:
+    uri: https://github.com/khozema-nullwala/spring-petclinic-concourse.git
+
+jobs:
+- name: build-app
+  public: true
+  plan:
+  - get: spring-petclinic
+    trigger: true
+  - task: build-web-app
+    file: spring-petclinic-concourse/task_build.yml

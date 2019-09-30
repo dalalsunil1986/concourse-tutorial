@@ -1,0 +1,13 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: openjdk, tag: "8u191-jdk-alpine3.9"}
+
+inputs:
+- name: spring-petclinic-concourse
+- name: spring-petclinic
+
+run:
+  path: spring-petclinic-concourse/tasks_script.sh 
