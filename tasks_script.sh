@@ -1,7 +1,13 @@
 #!/bin/sh
 
-set -e
+set -ex
 
-cd spring-petclinic
+output_dir=workspace
 
-mvnw -Dmaven.repo.local=$(pwd)/cache -DskipTests package
+mvn -Dmaven.repo.local=$(pwd)/spring-petclinic/cache -DskipTests -f $(pwd)/spring-petclinic/pom.xml package
+
+mv $(pwd)/spring-petclinic/target/*.jar "${output_dir}/"
+
+cp $(pwd)/spring-petclinic-concourse/docker/Dockerfile "${output_dir}/"
+
+ls -alR "${output_dir}"

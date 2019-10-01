@@ -1,19 +1,48 @@
 ---
 resources:
-- name: spring-petclinic
+- name: code
   type: git
   source:
-    uri: https://github.com/spring-projects/spring-petclinic.git
-- name: spring-petclinic-concourse
+    uri: https://github.com/khozema-nullwala/SimpleJavaApp.git
+
+- name: task-code
   type: git
   source:
-    uri: https://github.com/khozema-nullwala/spring-petclinic-concourse.git
+    uri: https://github.com/khozema-nullwala/concourse-tutorial.git
+
+- name: simple-java-app-docker-image
+  type: docker-image
+  source:
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
+    repository: ((docker-hub-username))/simple-java-app
+    tag: ((version))
 
 jobs:
 - name: build-app
+  serial: true
   public: true
   plan:
-  - get: spring-petclinic
+  - get: task-code
+  
+  - get: code
     trigger: true
-  - task: build-web-app
-    file: spring-petclinic-concourse/task_build.yml
+  
+  - task: build-app
+    file: task-code/task_build.yml
+
+  - put: simple-java-app-docker-image
+    params:
+      build: workspace
+
+- name: test-image
+  plan:
+  - get: simple-java-app-docker-image
+    passed: [build-app]
+    trigger: true
+  - task: test-simple-java-app
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source: {repository: ((docker-hub-username))/simple-java-app , tag: ((version))}
